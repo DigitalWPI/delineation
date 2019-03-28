@@ -4,16 +4,36 @@ import csv
 import os
 import collections
 import config
+import strip
 from helpers import update_str_to_list, remove_key, make_key_list, change_key_names, lambda_value_map, delete_keys
 
-def main(path,list_keys,deliated_strs,new_key_names,del_keys,lambdas,update):
-	print (path)
+def main(list_keys,deliated_strs,new_key_names,del_keys,lambdas,update):
+	files =  os.listdir('imports')
+	if '.keep' in files:
+		files.remove('.keep')
+	for path in files:
+		path = 'imports/'+path
+
+		print("Converting", path)
+
+		try:
+			change_file(path,list_keys,deliated_strs,new_key_names,del_keys,lambdas,update)
+		except json.decoder.JSONDecodeError as e:
+			if "Unexpected UTF-8 BOM" in str(e):
+				print("\nStripping UTF-8 BOM from begining of file...\n")
+				strip.strip(path)
+				try:
+					change_file(path,list_keys,deliated_strs,new_key_names,del_keys,lambdas,update)
+				except Exception as e:
+					print(f"Unable to do anything worth while to {path}. Riased {e}")
+
+
+def change_file(path,list_keys,deliated_strs,new_key_names,del_keys,lambdas,update):
 	with open (path,'r') as f:
 		all_records = json.load(f)
 	for row in all_records:
 		fix_items(row,list_keys,deliated_strs,new_key_names,del_keys,lambdas,update)
-		print('---FINAL---\n',json.dumps(row,indent=4),'\n\n')
-		print(row['description'][0])
+
 	filename = os.path.basename(path)
 	with open(f"exports/{filename}",'w') as outfile:
 		outfile.write(json.dumps(all_records,indent=4))
@@ -41,4 +61,4 @@ if __name__ == '__main__':
 	#config.del_keys
 	#config.lambdas
 	#config.update
-	main(sys.argv[1],config.list_keys,config.deliated_strs,config.new_key_names,config.del_keys,config.lambdas,config.update)
+	main(config.list_keys,config.deliated_strs,config.new_key_names,config.del_keys,config.lambdas,config.update)
