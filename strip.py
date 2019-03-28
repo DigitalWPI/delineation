@@ -1,3 +1,7 @@
+#usr/bin/python
+#this file strips BOM from the begining of files with BOM windows -> *nix issues
+# if you get "json.decoder.JSONDecodeError: Unexpected UTF-8 BOM (decode using utf-8-sig): line 1 column 1 (char 0)"
+# on some file run `strip.py path/to/file` then try again.
 import os, sys, codecs
 
 BUFSIZE = 4096
