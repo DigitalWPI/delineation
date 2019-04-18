@@ -1,4 +1,5 @@
 from copy import deepcopy
+from datetime import datetime, date
 
 def list_to_string(list,delimiter):
 	""" takes a list and a delimiter and turns list into a string """
@@ -73,3 +74,45 @@ def lambda_value_map(row,proc):
 def delete_keys(row,keys):
 	for key in keys:
 		del row[key]
+def create_embargo_col(row):
+	"""
+	takes in a record and modifies the record to now have embargo fields instead of
+	rdate type stuff. 
+	{...,'rdate' : '2015-01-01','availability': 'restricted'} will become:
+	
+	{...,
+	'embargo' : true,
+	'embargo_release_date' : '2015-01-01',
+	'embargo_visibility': [
+		'authenticated',
+		'public'
+		]
+	} 
+	goes from auth to pub, and from pub to pub, and from private to auth. unless specified.
+	"""
+	restrictions = ['public','authenticated','private']
+	release_day = row['rdate']
+
+	current_restriction = row['availability']
+	if current_restriction == "unrestricted":
+		current_restriction = 0
+	elif current_restriction == "restricted":
+		current_restriction = 1
+	else:
+		current_restriction = 2
+
+	post_restriction = current_restriction-1 if current_restriction != 0 else 0
+
+	if current_restriction == 0:
+		row['embargo'] = False
+		row['embargo_release_date'] = None
+		del row['rdate']
+		del row['availability']
+		return row
+	row['embargo'] = True
+	row['embargo_visibility'] = [restrictions[current_restriction], restrictions[post_restriction]]
+	print(row['embargo_visibility'], "EMBARGO STUFF")
+	row['embargo_release_date'] = release_day
+	del row['rdate']
+	del row['availability']
+	return row
