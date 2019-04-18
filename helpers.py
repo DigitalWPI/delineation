@@ -111,7 +111,6 @@ def create_embargo_col(row):
 		return row
 	row['embargo'] = True
 	row['embargo_visibility'] = [restrictions[current_restriction], restrictions[post_restriction]]
-	print(row['embargo_visibility'], "EMBARGO STUFF")
 	row['embargo_release_date'] = release_day
 	del row['rdate']
 	del row['availability']

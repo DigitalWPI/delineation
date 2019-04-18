@@ -52,7 +52,8 @@ def fix_items(row,str_lst,delstr_list,name_changes,to_delete_keys,lambdas,update
 	# print(json.dumps(row,indent=4),'\n\ndelete_keys')
 	delete_keys(row,to_delete_keys)
 	# print(json.dumps(row,indent=4),'\n\n')
-
+	#final update
+	row.update(update)
 
 if __name__ == '__main__':
 	#config.list_keys
