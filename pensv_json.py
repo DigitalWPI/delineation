@@ -1,10 +1,12 @@
+
 import json
+import sys
 import csv
 from copy import deepcopy
 from helpers import list_to_string, numify_key, in_maxes, remove_key,\
-	make_key_list, change_key_names, lambda_value_map, delete_keys
+	make_key_list, change_key_names, lambda_value_map, delete_keys, create_embargo_col
 
-def main():
+def example():
 	with open('/Users/awscott/samveraStuff/notes/ETD_JSON_indented_no_res_some.json') as jsonfile:
 		lists = json.load(jsonfile)
 	# lists=lists[6:7]
@@ -26,6 +28,28 @@ def main():
 		# row["description"][0].replace('\\n','\n')
 	print(f"{json.dumps(lists,indent=4)} \n\n{etd_string}\n\n{json.dumps(deep,indent=4)}")
 	with open('exports/dirty50.json','w') as f:
+		f.write(json.dumps(deep,indent=4))
+
+def main(file_path):
+	with open(file_path,'r') as f:
+		etd_string = f.read()
+	deep = read_deliniated_string(etd_string,new_line = "⛷",delimiter='⛸',list_delimiter="⛄")
+	list_keys = ["urn","resources","committee","contributor","advisor","creator","dtype","title","abstract","department",'sdate']
+	new_key_names = {"urn":"identifier","dtype":"resource_type","abstract":"description","sdate":"date_created","keywords":"keyword"}
+	del_keys = ['adate','cdate','ddate','url','notices']
+	create_year = lambda row,key : row.update({"year":row[key][0][0:4]} if key == "date_created" else {})
+	create_embargo = lambda row,key : create_embargo_col(row) if key == 'rdate' else {}#add embargo stuff
+	for row in deep:
+		make_key_list(row,list_keys)
+		change_key_names(row,new_key_names)
+		lambda_value_map(row,create_year)
+		lambda_value_map(row,create_embargo)
+		delete_keys(row,del_keys)
+		row["license"]=["https://creativecommons.org/licenses/by/4.0/"]
+
+		# row["description"][0].replace('\\n','\n')
+	#print(f"{etd_string}\n\n{json.dumps(deep,indent=4)}")
+	with open(file_path+'_converted.json','w') as f:
 		f.write(json.dumps(deep,indent=4))
 
 def read_deliniated_string(entire_file_as_string,new_line = "💩",delimiter='👙',list_delimiter="{|,|}"):
@@ -119,4 +143,4 @@ def flatten_list_of_dict(lod,max_lod,keys):
 
 
 if __name__ == '__main__':
-	main()
+	main(sys.argv[1])

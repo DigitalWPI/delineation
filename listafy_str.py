@@ -3,9 +3,11 @@ import json
 import csv
 import os
 import collections
-import config
+import json_config as config
+import dsv_config
 import strip
 from helpers import update_str_to_list, remove_key, make_key_list, change_key_names, lambda_value_map, delete_keys
+import dsv_json
 
 def main(list_keys,deliated_strs,new_key_names,del_keys,lambdas,update):
 	files =  os.listdir('imports')
@@ -13,19 +15,29 @@ def main(list_keys,deliated_strs,new_key_names,del_keys,lambdas,update):
 		files.remove('.keep')
 	for path in files:
 		path = 'imports/'+path
+		if not path[-5:].lower() == '.json':
+			#for any non-json file it must be a dsv file.
+			#so we will call the same version of this code
+			#for dsv's but with the dsv config
+			print("Converting dsv file:", path)
+			dsv_json.convert_and_call_dsv(path,dsv_config)
+		else:
+			#otherwise this is surely a json file
+			#use the config to turn it into an 
+			#ingestable dataset
 
-		print("Converting", path)
+			print("Converting json file:", path)
 
-		try:
-			change_file(path,list_keys,deliated_strs,new_key_names,del_keys,lambdas,update)
-		except json.decoder.JSONDecodeError as e:
-			if "Unexpected UTF-8 BOM" in str(e):
-				print("\nStripping UTF-8 BOM from begining of file...\n")
-				strip.strip(path)
-				try:
-					change_file(path,list_keys,deliated_strs,new_key_names,del_keys,lambdas,update)
-				except Exception as e:
-					print(f"Unable to do anything worth while to {path}. Riased {e}")
+			try:
+				change_file(path,list_keys,deliated_strs,new_key_names,del_keys,lambdas,update)
+			except json.decoder.JSONDecodeError as e:
+				if "Unexpected UTF-8 BOM" in str(e):
+					print("\nStripping UTF-8 BOM from begining of file...\n")
+					strip.strip(path)
+					try:
+						change_file(path,list_keys,deliated_strs,new_key_names,del_keys,lambdas,update)
+					except Exception as e:
+						print(f"Unable to do anything worth while to {path}. Riased {e}")
 
 
 def change_file(path,list_keys,deliated_strs,new_key_names,del_keys,lambdas,update):
