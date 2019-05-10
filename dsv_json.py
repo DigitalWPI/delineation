@@ -20,7 +20,6 @@ def convert_and_call_dsv(file_path,config):
 	with open(file_path,'r') as f:
 		etd_string = f.read()
 	all_records = read_deliniated_string(etd_string,new_line = new_line,delimiter=delimiter,list_delimiter=list_delimiter)
-
 	for row in all_records:
 		fix_items(row,list_keys,{},new_key_names,del_keys,lambdas,update)
 
@@ -41,8 +40,10 @@ def read_deliniated_string(entire_file_as_string,new_line = "ğŸ’©",delimiter='ğŸ
 		for item in list_:
 			if list_delimiter in item:
 				item = item.split(list_delimiter)
+				item = remove_blanks(item)
 			new_row.append(item)
-		new.append(new_row)
+		if new_row != ['']:
+			new.append(new_row)
 	headings = new[0]
 	final_list = []
 	for row in new[1:]:
@@ -51,6 +52,15 @@ def read_deliniated_string(entire_file_as_string,new_line = "ğŸ’©",delimiter='ğŸ
 			name_val[headings[index]] = col
 		final_list.append(name_val)
 	return final_list
+
+def remove_blanks(list_):
+	for n,item in enumerate(list_):
+		#list_[n] = item.strip()
+		if not item.strip():
+			list_[n] = ""
+	if "" in list_:
+		list_.remove("")
+	return list_
 
 if __name__ == '__main__':
 	main(sys.argv[1])
