@@ -2,7 +2,7 @@
 This is a simple python tool to convert Deliniator Seperated Files like comma seperated files, semicolon seperated files, and so on into multidemensional json files of depth 3. It can also take Json files which were exported improperly with Deliniated strings that represent lists and convert them.
 simple but frequently done things
 
-##how to use
+## how to use
 - place any files delinated by characters into the imports folder ensuring dsvs have the extension `.dsv`
 - place any json files you wish to convert in imports as well
 - edit [dsv_config] and/or [json_config] to reflect the changes you want
