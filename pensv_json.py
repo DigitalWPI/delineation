@@ -1,4 +1,4 @@
-
+# this file was used for testing when the problem was first presented
 import json
 import sys
 import csv
@@ -11,8 +11,8 @@ def example():
 		lists = json.load(jsonfile)
 	# lists=lists[6:7]
 
-	etd_string = prepare_csv(lists,new_line = "🍌",delimiter='🍑',list_delimiter="👙")
-	deep = read_deliniated_string(etd_string,new_line = "🍌",delimiter='🍑',list_delimiter="👙")
+	etd_string = prepare_csv(lists,new_line = "😊",delimiter='🍑',list_delimiter="☕")
+	deep = read_deliniated_string(etd_string,new_line = "😊",delimiter='🍑',list_delimiter="☕")
 
 	list_keys = ["urn","resources","committee","contributor","advisor","creator","dtype","title","abstract","department",'sdate']
 	new_key_names = {"urn":"identifier","dtype":"resource_type","abstract":"description","sdate":"date_created","keywords":"keyword"}
