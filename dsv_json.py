@@ -21,8 +21,11 @@ def convert_and_call_dsv(file_path,config):
 		etd_string = f.read()
 	all_records = read_deliniated_string(etd_string,new_line = new_line,delimiter=delimiter,list_delimiter=list_delimiter)
 	for row in all_records:
-		fix_items(row,list_keys,{},new_key_names,del_keys,lambdas,update)
-
+		try:
+			fix_items(row,list_keys,{},new_key_names,del_keys,lambdas,update)
+		except KeyError as e:
+			print ("KeyError:",e,'\n',row)
+			raise
 	filename = os.path.basename(file_path)
 	file_only, extension = os.path.splitext(filename)
 	filename = file_only+'_converted.json'
