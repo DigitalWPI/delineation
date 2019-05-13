@@ -35,7 +35,7 @@ del_keys = [ #things to remove
 	'url',
 	'notices'
 ]
-lambdas = [ #inline fuction definitions
+lambdas = [ #inline fuction definitions, applied to all keys in row
 	lambda row,key : row.update({"year":row[key][0][0:4]} if key == "date_created" else {}), #create year
 	lambda row,key : helpers.create_embargo_col(row) if key == 'rdate' else {},#add embargo stuff
 	lambda row,key : row.update({"description":[item.strip('"') for item in row[key]]} if key == 'description' else {}), # remove extra quotes
