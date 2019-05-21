@@ -114,7 +114,7 @@ def create_embargo_col(row):
 	row['embargo_release_date'] = release_day
 	if release_day == '0000-00-00':
 		# edge case, restrict for ever if this date is used.
-		row['embargo_visibility'] = ['private','authenticated'] #make authenticated its final state
+		row['embargo_visibility'] = ['private',restrictions[current_restriction]] #make authenticated its final state
 		row['embargo_release_date'] = '1776-07-04' # release date in the past (it wont show up)
 
 	del row['rdate']
