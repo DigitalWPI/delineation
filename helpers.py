@@ -101,18 +101,31 @@ def create_embargo_col(row):
 	else:
 		current_restriction = 2
 
-	post_restriction = current_restriction-1 if current_restriction != 0 else 0
+	post_restriction = 0
 
 	if current_restriction == 0:
-		row['embargo'] = False
-		row['embargo_release_date'] = None
-		del row['rdate']
-		del row['availability']
-		return row
+		if release_day == '0000-00-00' or datetime.strptime(row['rdate'],"%Y-%m-%d") < datetime.today():
+			#perfect we dont need any restrictive stuff
+			row['embargo'] = False
+			row['embargo_release_date'] = None
+			del row['rdate']
+			del row['availability']
+			return row
+		else: # edge case given by Aaron Neslin Tuesday May 28th 2019
+			# case: future rdate, but says 'unrestricted' : keep restricted for ever.
+			row['embargo'] = True
+			row['embargo_visibility'] = ['private','authenticated'] #make current state its final state
+			row['embargo_release_date'] = '1776-07-04' # release date in the past (it wont show up)
+			print(f"WARNING: restricting previously unrestricted work: {row['identifier']}",\
+				f"\n{release_day}{row['availability']}",\
+				"\nSend Email to Aaron Neslin / Emily O'Brien about this")
+			del row['rdate']
+			del row['availability']
+			return row
 	row['embargo'] = True
 	row['embargo_visibility'] = [restrictions[current_restriction], restrictions[post_restriction]]
 	row['embargo_release_date'] = release_day
-	if release_day == '0000-00-00':
+	if release_day == '0000-00-00': # needs to be restricted
 		# edge case, restrict for ever if this date is used.
 		row['embargo_visibility'] = ['private',restrictions[current_restriction]] #make current state its final state
 		row['embargo_release_date'] = '1776-07-04' # release date in the past (it wont show up)
